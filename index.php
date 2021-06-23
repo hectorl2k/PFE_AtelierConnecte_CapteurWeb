@@ -37,8 +37,13 @@ $tab_selected = vision_data_mesure;
   <div id="All_page_print">
    
       <div id="Erreur_Impression" class="modal-contents">
-        <h4> Passer par le bouton imprimante afin initialiser l'impression</h4>
+<!--        <h4> Passer par le bouton imprimante afin initialiser l'impression</h4>-->
+<?php echo impression();?>
       </div>
+
+
+
+
    
   </div>
 
@@ -55,7 +60,7 @@ $tab_selected = vision_data_mesure;
 
     <div id="Choix_donnees">
       <div id="Rechercher_text">Rechercher :</div>
-      <div id='Bouton_Open_PopUp_Print'></div>
+      <div id='Bouton_Open_PopUp_Print' class='Open_PopUp_Print'></div>
 
       <form action="" method="post" class="Recherche_BaseSQL">
 
@@ -98,7 +103,7 @@ $tab_selected = vision_data_mesure;
     </div>
 
 
-    <div id="Affiche_tableau" >
+    <div id="Affiche_tableau" align='center' >
       <table class="w3-table-all w3-card-4" style="table-layout: auto; width: 95%; position: static; overflow-y: scroll; max-height: 300px" ;>
 
         <?php
@@ -129,25 +134,21 @@ $tab_selected = vision_data_mesure;
       </div>
     </div>
 
-    <div id="PopUp_Print-Setup" class="modal">
+  <div id="PopUp_Print-Setup" class="modal">
 
       <div class="modal-content">
-        <span id="cls_Print-Setup" class="close">&times;</span>
-        <div id="Show-Print-Setup">
-          <p> <?php print_setup(); ?> </p>
-        </div>
+          <span id="cls_Print-Setup" class="close">&times;</span>
+          <div id="Show-Print-Setup">
+              <p> <?php print_setup(); ?> </p>
+          </div>
       </div>
-
-
-
-    </div>
-
-
-
-
+  </div>
 
 
   </div>
+
+
+
 
 
 

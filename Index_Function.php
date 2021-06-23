@@ -132,43 +132,51 @@ function afficher_erreur(){
 
 
 }
-function creation_tableau($link,$result,$tab_selected,$mode){
+
+function creation_tableau($link,$result_data,$tab_selected,$mode){
     $nom_tableau=$_SESSION['nom_tableau_print_data'];
-    $max_column = count(explode(",", $_POST['colonne_last_requette']));
+    $colonne_last_requette_data=explode(",",$_POST['colonne_last_requette']);
+    $max_column = count($colonne_last_requette_data);
+
     $col_name_bd=$_SESSION["col_name_bd"];
     $col_name_http=$_SESSION["col_name_http"];
-    $col_error=-1;
-    $col_path=-1;
 
 
-
+    $DataStartStop_data=$_SESSION['DataStartStop'][vision_data_mesure];
     $type_col=$_SESSION["type_col"];
-    $colonne_last_requette=explode(",",$_POST['colonne_last_requette']);
-    $nbr_col=count($colonne_last_requette);
 
 
-    for ($i=0;$i<$nbr_col;$i++)
+    $lim_data_ref=find_data_ref($link);
+    $max_column_ref=count($lim_data_ref);
+
+
+    $col_name_data=array_slice($col_name_bd[vision_data_mesure],$DataStartStop_data[0],$DataStartStop_data[0]);
+
+    $col_path=$col_data_start=$col_error=-1;
+    for ($i=0;$i<$max_column;$i++)
     {
-        $index=array_search($colonne_last_requette[$i],$col_name_bd[$tab_selected]);
+        $index=array_search($colonne_last_requette_data[$i],$col_name_bd[$tab_selected]);
 
         $nom_col[$i]=$col_name_http[$tab_selected][$index];
 
-        if( $colonne_last_requette[$i] == "Code_Erreur")
+        if( $colonne_last_requette_data[$i] == "Code_Erreur")
         {$col_error=$i;}
 
-
-        if( $colonne_last_requette[$i] == "Photo")
+        if( $colonne_last_requette_data[$i] == "Photo")
         {$col_path=2;}
 
-
+        if( in_array($colonne_last_requette_data[$i],$col_name_data) && $col_data_start==-1)
+        { $col_data_start=$i;
+        };
     }
+    $nb_colinfo_and_data=$max_column_ref/2 +$col_data_start;
 
     $value = "<thead>
                 <tr>
                     <th colspan='$max_column'>$nom_tableau</th>
                 </tr><tr>    ";
 
-    for($i=0;$i<$nbr_col;$i++)
+    for($i=0;$i<$max_column;$i++)
     {
         $value.= "<th>".$nom_col[$i]."</th>";
     }
@@ -176,25 +184,34 @@ function creation_tableau($link,$result,$tab_selected,$mode){
 
     $data=array();
     $i=0;
-    if($result!==FALSE){                          // pas erreur dans la requete
 
-        if($row = mysqli_fetch_array($result))         // regarde si la requete renvoi rien
+    if($result_data!==FALSE){                          // pas erreur dans la requete
+
+        if($row = mysqli_fetch_array($result_data))         // regarde si la requete renvoi rien
         {
             do {
                 $value.= "<tr>";
-                for($col=0;$col<$nbr_col;$col++)    // GL: "$nbr_col_tab_select" = Nb de colonnes à afficher
+                $ref_col_data=0;
+                for($col=0;$col<$max_column;$col++)    // GL: "$nbr_col_tab_select" = Nb de colonnes à afficher
                 {
-                    if($col==$col_path)
+                    $temp_col_ref_min= $col+($col-$col_data_start)-$col_data_start;
+                    $temp_col_ref_max=$temp_col_ref_min+1;
+
+
+
+                     if($col==$col_path)
                     {
                         $value.= path_btn($row[$col],$row[0]);
 
-                    }elseif($col_error >= 0  && $row[$col_error] >0 && $_SESSION['num_col_start_data'][vision_data_mesure] <= $col){     // Verifie que col erreur existe
+                    }elseif (($col<$nb_colinfo_and_data)&&($col >=$col_data_start)  && ($row[$col] < $lim_data_ref[$temp_col_ref_min] || $row[$col] > $lim_data_ref[$temp_col_ref_max]))
+                    {
 
-                        $value.= "<td><div>".bold($link,$col,$row[$col])."</div></td>";
-                    }else{
-                       // $value.= "<td><div>".bold($link,$col,$row[$col])."</div></td>";
-                        $value.= "<td>". $row[$col] ."</td>";
+                        $value.= "<td><p class='data_error'>".$row[$col]."</p></td>";
+                    }else
+                    {
+                        $value.= "<td><p class='no_error'>".$row[$col]."</p></td>";
                     }
+
 
 
 
@@ -210,7 +227,7 @@ function creation_tableau($link,$result,$tab_selected,$mode){
 
                 $i = $i + 1;
 
-            } while ($row = mysqli_fetch_array($result));
+            } while ($row = mysqli_fetch_array($result_data));
 
 
 
@@ -228,57 +245,16 @@ function creation_tableau($link,$result,$tab_selected,$mode){
     }else{echo $value;}
 
 }
-function bold($link,$col,$val)
-{
 
 
-    $col_name_bd=$_SESSION["col_name_bd"];
-    $tab_data = vision_data_mesure;
-    $tab_ref=vision_data_reference;
-
-    $num_col_start_data=$j=$_SESSION['num_col_start_data'][$tab_data];
-    $num_col_start_ref=$j=$_SESSION['num_col_start_data'][$tab_ref];
-
-
-
-    $tab_name=$_SESSION["tab_name"];
-
-    $res="$val";
-    $col_min=($col+($num_col_start_ref-$num_col_start_data))+($col-$num_col_start_data); // Je fais en sorte incrementer l'ecart entre chaque colonne et de faire en sorte de suivre l'ecart entre les deux tables
-
-
-    $ref_name_min=$col_name_bd[vision_data_reference][$col_min];
-    $ref_name_max=$col_name_bd[vision_data_reference][$col_min+1];
-
-
-    if($_SESSION['id_mesure_ref'] ==-1)
-    {$request="SELECT id,$ref_name_min,$ref_name_max From ".$tab_name[vision_data_reference]." ORDER BY ID DESC LIMIT 0,1";
-    }else{
-        $request="SELECT id,$ref_name_min,$ref_name_max From ".$tab_name[vision_data_reference]." where id =".$_SESSION['id_mesure_ref'];
-    }
-    $result=mysqli_query($link,$request);
-    $row = mysqli_fetch_array($result);
-
-
-    if (($val < $row[1]) || ($val >$row[2])  ) {
-
-
-        $res = "<p class='data-error'>$val</p>";              // On met la valeur en gras
-
-    }
-
-
-
-
-    return $res;
-}
-function calcul_maxColumn($print_ColData,$print_data_StartStop){
+function calcul_maxColumn($print_ColData,$col_start_data,$col_stop_data){
 
     $i=0;
     $nb_column=0;
+
     do{
         $col=$print_ColData[$i];
-        if($col >= $print_data_StartStop[0] && $col <= $print_data_StartStop[1])
+        if($col >= $col_start_data && $col <= $col_stop_data)
         {$nb_column=$nb_column+2;}
         else{$nb_column++;}
         $i++;
@@ -296,7 +272,7 @@ function path_btn($data,$id)
     $divbtn[0]= "<div id=\"PopUp_path$id\" class=\"modal\">";
     $divbtn[1]="<div id=\"popup$id\" class=\"modal-content\">";
     $divbtn[2]="<span id=\"btnClose$id\" class=\"close\"<>&times;</span>";
-    $divbtn[3]="<h4>Path : </h4><p>$data</p>";
+    $divbtn[3]="<h4>Chemin accès : </h4><p>$data</p>";
 
     if (array_key_exists (1,$path))
     {
@@ -312,12 +288,15 @@ function impression()
 {
 
     $link = connection();
+    $tab_data = vision_data_mesure;
+    $tab_ref=vision_data_reference;
     $col_name_http = $_SESSION["col_name_http"];
     $print_ColData = $_SESSION['print_ColData'];
-    $print_data_StartStop = $_SESSION['print_data_StartStop'];
-    $num_col_start_data = $j = $_SESSION['num_col_start_data'][vision_data_mesure];
-    $num_col_start_ref = $j = $_SESSION['num_col_start_data'][vision_data_reference];
-    $max_column = calcul_maxColumn($print_ColData, $print_data_StartStop);
+    $DataStartStop=$_SESSION['DataStartStop'];
+    $num_col_start_data=$j=$DataStartStop[$tab_data][0];
+    $num_col_start_ref=$j=$DataStartStop[$tab_ref][0];;
+    $num_col_stop_data=$j=$DataStartStop[$tab_data][1];
+    $max_column = calcul_maxColumn($print_ColData,$num_col_start_data,$num_col_stop_data);
 
 
     if (isset($_POST['Nom_Equipement'])) {
@@ -336,7 +315,7 @@ function impression()
 
     do {
         $col = $print_ColData[$i];
-        if ($col >= $print_data_StartStop[0] && $col <= $print_data_StartStop[1]) {
+        if ($col >= $num_col_start_data && $col <= $num_col_stop_data) {
             $div_print.= "<th colspan=2 class='en-tete' style='padding: 1px'> " . $col_name_http[vision_data_mesure][$col] . "</th>\n";
         } else {
             $div_print.= "<th colspan=1 class='en-tete' style='padding: 1px'>" . $col_name_http[vision_data_mesure][$col] . "</th>\n";
@@ -346,13 +325,15 @@ function impression()
     $div_print.= "</tr><tr>";
 
 
-    $i = 0;
+   $i = 0;
+
     do {
         $col = $print_ColData[$i];
-        if ($col >= $print_data_StartStop[0] && $col <= $print_data_StartStop[1]) {
+        if ($col >= $num_col_start_data && $col <= $num_col_stop_data) {
             $col_min = ($col + ($num_col_start_ref - $num_col_start_data)) + ($col - $num_col_start_data); // Je fais en sorte incrementer l'ecart entre chaque colonne et de faire en sorte de suivre l'ecart entre les deux tables
             $div_print.= "<th class='en-tete' style='padding: 1px'>" . $col_name_http[vision_data_reference][$col_min] . "</th> \n";
             $div_print.= "<th class='en-tete' style='padding: 1px'>" . $col_name_http[vision_data_reference][$col_min + 1] . "</th> \n";
+
         } else {
             $div_print.= "<th class='en-tete' style='padding: 1px'>" . $col_name_http[vision_data_reference][$col] . "</th>";
         }
@@ -363,24 +344,26 @@ function impression()
 
     $result = FindSQL_ref($link);
     $row = mysqli_fetch_array($result);
-    $i = 0;
+    $i =$k= 0;
 
     do {
         $col = $print_ColData[$i];
-        if ($col >= $print_data_StartStop[0] && $col <= $print_data_StartStop[1]) {
+        if ($col >= $num_col_start_data && $col <= $num_col_stop_data) {
             $col_min = ($col + ($num_col_start_ref - $num_col_start_data)) + ($col - $num_col_start_data); // Je fais en sorte incrementer l'ecart entre chaque colonne et de faire en sorte de suivre l'ecart entre les deux tables
 
 
             $div_print.= "<td>" . $row[$col_min] . "</td>";
             $div_print.= "<td>" . $row[$col_min + 1] . "</td>";
-
+            $data_ref[$k]=$row[$col_min];
+            $data_ref[$k]=$row[$col_min+1];
+            $k+=2;
         } else {
             $div_print.= "<td>" . $row[$col] . "</td>";
         }
 
         $i++;
     } while ($i < count($print_ColData) - 1);
-
+$_POST['data_ref_last_requete']=$data_ref;
     $div_print.= "</tr></table></div><hr>
 
             <div id='Affiche_tableau_reference' align='center'>
@@ -401,6 +384,54 @@ function impression()
 
 
 
+function find_data_ref($link)
+{
+
+        $tab_name=$_SESSION['tab_name'][vision_data_reference];
+        $j=0;
+        $ref_col_name="";
+        $col_name_bd = $_SESSION["col_name_bd"];
+        $col_name = explode(',',$_POST['colonne_last_requette']);
+        $num_col_start_ref= $_SESSION['DataStartStop'][vision_data_reference][0];
+        $num_col_start_data=$_SESSION['DataStartStop'][vision_data_mesure][0];
+
+        for ($i = 0; $i < count($col_name)-1; $i++) {
+            $num_col[$i] = array_search($col_name[$i], $col_name_bd[vision_data_mesure]);
+            if($num_col[$i]>=$num_col_start_data)
+            { $ref_col[$j]=$num_col[$i];
+                $j++;
+            }
+        }
+        for ($i=0;$i<=count($ref_col)-1;$i++)
+        {
+            $col=$ref_col[$i];
+            $col_min = ($col + ($num_col_start_ref - $num_col_start_data)) + ($col - $num_col_start_data); // Je fais en sorte incrementer l'ecart entre chaque colonne et de faire en sorte de suivre l'ecart entre les deux tables
+            $ref_col_name.=$col_name_bd[vision_data_reference][$col_min].','.$col_name_bd[vision_data_reference][$col_min+1].',';
+        }
+        $ref_col_name=substr($ref_col_name,0,-1);
+
+
+        if($_SESSION['id_mesure_ref'] ==-1)
+        {$request="SELECT id,$ref_col_name From ".$tab_name." ORDER BY ID DESC LIMIT 0,1";
+        }else{
+         $request="SELECT id,$ref_col_name From ".$tab_name." where id =".$_SESSION['id_mesure_ref'];
+        }
+
+        $result_ref = mysqli_query($link, $request);
+        $row = mysqli_fetch_array($result_ref);
+
+//echo count($row);
+
+    $max=count(explode(',',$ref_col_name));
+
+     for($i=0;$i<$max;$i++)
+     {$res[$i]=intval($row[$i+1]);     }
+
+        return $res;
+
+
+
+}
 
 
 
@@ -409,8 +440,6 @@ function impression()
 
 
 ?>
-
-
 
 
 

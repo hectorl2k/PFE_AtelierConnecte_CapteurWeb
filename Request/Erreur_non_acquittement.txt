@@ -1,1 +1,1 @@
-time=2021-04-27 15:09:51&tab=vision_data_mesure&id=18&erreur=1
+time=2021-05-03 09:31:26&tab=vision_data_mesure&id=19&erreur=4

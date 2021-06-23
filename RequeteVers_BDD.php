@@ -111,6 +111,7 @@ function FindSQL($link,$BD_tab,$mode){
     $_POST['colonne_last_requette']=$colonne;
 
         $result = mysqli_query($link, $condi_final);
+
     return $result;
 }
 

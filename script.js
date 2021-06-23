@@ -138,7 +138,11 @@ document.getElementById('Bouton_Open_PopUp_Print').addEventListener('click',()=>
     last_popUp=popup_print;
 });
 
-
+document.getElementById('Erreur_Impression').addEventListener('click',()=> {
+    console.log("dede");
+    popup_print.style.display="block";
+    last_popUp=popup_print;
+});
 
 document.getElementById('Annuler_impression').addEventListener('click',()=> {
     last_popUp.style.display="none";

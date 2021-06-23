@@ -394,10 +394,10 @@ title{
         position: center;
     }
     
-    .data-error{    color: red;}
+    .data_error{    color: red;}
 
 
-    #Bouton_Open_PopUp_Print{
+    .Open_PopUp_Print{
         position: relative;
         right: -90vw;
         transform: translateX(-50%);
