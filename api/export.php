@@ -49,7 +49,7 @@ function getData()
         $date = "where (timestamp between \"$date_start\" and \"$date_stop\") ";
     }
     $query = "SELECT * FROM $table $date ORDER BY ID DESC LIMIT 0,$Max_rows";
-    echo $query;
+
     $response = array();
     $result = mysqli_query($conn, $query);
     while($row = mysqli_fetch_array($result))
