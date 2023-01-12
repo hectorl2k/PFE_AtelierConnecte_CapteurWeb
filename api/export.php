@@ -46,9 +46,10 @@ function getData()
         $date_start = $_GET['start'];
         $date_stop = $_GET['stop'];
 
-        $date = "and (DateHeure between \"$date_start\" and \"$date_stop\") ";
+        $date = "where (timestamp between \"$date_start\" and \"$date_stop\") ";
     }
     $query = "SELECT * FROM $table $date ORDER BY ID DESC LIMIT 0,$Max_rows";
+    echo $query;
     $response = array();
     $result = mysqli_query($conn, $query);
     while($row = mysqli_fetch_array($result))
