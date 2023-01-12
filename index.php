@@ -66,11 +66,6 @@ $result=GetTabname($link);
 
 <hr>
 
-
-
-
-
-
 <div id="Affiche_tableau">
   <table class="w3-table-all w3-card-4" style="table-layout: auto; width: 75%; position: static; overflow-y: scroll; max-height: 300px">
       <?php
