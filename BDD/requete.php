@@ -61,7 +61,7 @@ function GetColumnName($link,$table)
 function FindSQL($link,$table)
 {
 
-    $reqInsert = "SELECT * FROM $table";
+    $reqInsert = "SELECT * FROM $table ORDER BY id DESC";
     return mysqli_query($link, $reqInsert);
 
 }

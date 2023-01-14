@@ -17,8 +17,8 @@ $result=GetTabname($link);
        <meta charset='utf-8'>
        <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes'>
        <title>Graph</title>
-       <link rel='stylesheet' type='text/css' href='style.css'>
-       <script src="chart.js"></script>
+       <link rel='stylesheet' type='text/css' href='HTML/style.css'>
+       <script src="HTML/chart.js"></script>
    </head>
 
 
