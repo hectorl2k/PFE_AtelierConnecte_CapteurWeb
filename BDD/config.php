@@ -9,8 +9,8 @@ define('float',0);
 // Base de donnée
 
 $_SESSION['Serveur']=    "localhost";
-$_SESSION['Server_user']=      "romain";
-$_SESSION['Server_pass']=      "romain";
+$_SESSION['Server_user']=      "admin_bc";
+$_SESSION['Server_pass']=      "password_bc";
 $_SESSION['db_name']=        "atelierconnectes";
 
 
