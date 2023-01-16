@@ -9,7 +9,7 @@ $link = Connection();     // Connection a la base de donnée
 
 if ($link)              // Si On est bien connécté
 {
-    echo "Connectés <br>";
+    echo "Connectés";
 
     $id_boitier = $_GET["ID_Boitier"];
 
@@ -29,7 +29,6 @@ if ($link)              // Si On est bien connécté
         $nbrDistance_Flux = 0;
     }
     $nbrTotalCaptDistance=$nbrDistance_Dist+$nbrDistance_Flux;
-    echo $nbrDistance_Dist;
     $reqData_colomn="";
     $reqData_data="";
 
@@ -40,7 +39,7 @@ if ($link)              // Si On est bien connécté
         {
             echo "<br>Erreur Lors de la Création de la Table";
         }else{
-            echo "<br>Création de la Table effectué";
+            echo "<br>Boitier non reconnu, création de la Table effectué";
         }
     }
     GetData();                              // récupére les paramètre de la requete
@@ -49,7 +48,7 @@ if ($link)              // Si On est bien connécté
         {
             echo "<br>Erreur Lors de la sauvegarde des données";
         }else{
-            echo "<br> Sauvegarde Réussis";
+            echo "<br> Sauvegarde des données Réussis";
         }
 
 

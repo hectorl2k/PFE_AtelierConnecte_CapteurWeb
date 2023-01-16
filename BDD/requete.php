@@ -13,7 +13,7 @@ function Connection()
     {
         $sql = "CREATE DATABASE $db_name";
         if ($connection->query($sql) === TRUE) {
-            echo "Database created successfully";
+            echo "Fin de la Création de la Base de donnée";
             mysqli_select_db($connection,$db_name);
         } else {
             echo "Error creating database: " . $connection->error;
