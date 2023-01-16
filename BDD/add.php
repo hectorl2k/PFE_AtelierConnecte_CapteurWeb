@@ -1,6 +1,7 @@
 <?php
 
 include("config.php");
+include ("requete.php");
 
 
 $link = Connection();     // Connection a la base de donnée
@@ -57,7 +58,7 @@ if ($link)              // Si On est bien connécté
     echo "ERROR";
 }
 
-
+/*
 function Connection()
 {
 
@@ -68,6 +69,7 @@ function Connection()
     mysqli_select_db($connection, $_SESSION["db_name"]) or die('MySQL ERROR: ' . mysqli_error());
     return $connection;
 }
+*/
 
 function GetData()
 {
