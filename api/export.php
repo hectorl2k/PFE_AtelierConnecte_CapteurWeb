@@ -38,8 +38,10 @@ function getData()
     {
         $Max_rows=$_GET['limit'];
     }
+    if(isset($_GET['table_select']))
+    {
     $table =$_GET['table_select'];
-
+    }else    {echo "Paramétre : table_select, limit, start,stop";}
     global $conn;
     $date="";
     if (isset($_GET['start'])) {
