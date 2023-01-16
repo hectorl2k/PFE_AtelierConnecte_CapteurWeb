@@ -60,8 +60,8 @@ function GetColumnName($link,$table)
 }
 function FindSQL($link,$table)
 {
-
-    $reqInsert = "SELECT * FROM $table ORDER BY id DESC";
+    $max_row=$_SESSION['max_rows_html'];
+    $reqInsert = "SELECT * FROM $table ORDER BY id DESC LIMIT 0,$max_row";
     return mysqli_query($link, $reqInsert);
 
 }
